@@ -8,7 +8,6 @@ init(autoreset=True)
 
 
 class ColorFormatter(logging.Formatter):
-    """Formatter con colores solo para consola."""
 
     COLORS = {
         logging.DEBUG: Fore.BLUE,
@@ -26,7 +25,7 @@ class ColorFormatter(logging.Formatter):
 
 
 def setup_logger(name: str, kind: str) -> logging.Logger:
-    """Crea logger con archivo único por corrida (sin duplicados)."""
+
     logs_dir = Path("logs")
     logs_dir.mkdir(exist_ok=True)
 
@@ -36,17 +35,14 @@ def setup_logger(name: str, kind: str) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
-    # 🔑 Limpiar handlers viejos antes de añadir nuevos
     if logger.hasHandlers():
         logger.handlers.clear()
 
     base_fmt = "%(asctime)s [%(levelname)s] %(message)s"
 
-    # Archivo (sin colores)
     fh = logging.FileHandler(log_file, encoding="utf-8")
     fh.setFormatter(logging.Formatter(base_fmt))
 
-    # Consola (con colores)
     ch = logging.StreamHandler()
     ch.setFormatter(ColorFormatter(base_fmt))
 

@@ -1,77 +1,51 @@
 """
-CLI para descargar secuencia de slides y generar PDF.
+CLI to download a sequence of slides and generate PDFs.
+Saves all PDFs in a folder named slides_<timestamp>.
 """
 
 import argparse
-import shutil
+import yaml
 from pathlib import Path
 from datetime import datetime
 
-from colorama import Fore, Style, init
-
-from thinkfic_downloader.slides.slides import download_images, images_to_pdf
-from thinkfic_downloader.logs import setup_logger
-
-# Inicializar colorama para colores en consola
-init(autoreset=True)
-
-# Logger con archivo único por corrida
-logger = setup_logger("slides-cli", kind="slides")
+from thinkfic_downloader.slides.core import download_all_slides
+from thinkfic_downloader.config import load_config
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Descargar slides y generar un PDF")
-    parser.add_argument("urls", help="Archivo de texto con URLs (una por línea)")
-    parser.add_argument(
-        "--out",
-        help="Nombre del PDF final (si no se pasa, se genera con timestamp)",
-    )
+    parser = argparse.ArgumentParser(description="Download slide presentations and generate PDFs")
+    parser.add_argument("yaml_file", help="YAML file containing 'name' and 'last_url'")
+    parser.add_argument("--outdir", type=Path, help="Base directory where the slides_<timestamp> folder will be created")
     args = parser.parse_args()
 
-    # Timestamp único
+    data = yaml.safe_load(open(args.yaml_file, "r", encoding="utf-8"))
+
+    cfg = load_config("slides")
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-    # Carpeta temporal con timestamp
-    out_dir = Path(f"slides_tmp_{timestamp}")
-
-    # Nombre del PDF final
-    pdf_out = Path(args.out) if args.out else Path(f"slides_{timestamp}.pdf")
-
-    with open(args.urls, "r", encoding="utf-8") as f:
-        urls = [line.strip() for line in f if line.strip()]
-
-    logger.info("Iniciando descarga de %d slides", len(urls))
-    local_images = download_images(urls, out_dir)
-
-    ok_count = len(local_images)
-    fail_count = len(urls) - ok_count
-
-    # Resumen con colores
-    logger.info("===== RESUMEN SLIDES =====")
-    logger.info(
-        "%s✔ OK: %d%s | %s✘ FAIL: %d%s",
-        Fore.GREEN,
-        ok_count,
-        Style.RESET_ALL,
-        Fore.RED,
-        fail_count,
-        Style.RESET_ALL,
-    )
-
-    if ok_count > 0:
-        images_to_pdf(local_images, pdf_out)
-        logger.info("%sPDF generado:%s %s", Fore.CYAN, Style.RESET_ALL, pdf_out)
+    if args.outdir:
+        output_root = args.outdir / f"slides_{timestamp}"
     else:
-        logger.error(
-            "%sNo se generó el PDF (ninguna imagen descargada).%s",
-            Fore.RED,
-            Style.RESET_ALL,
-        )
+        output_root = Path(cfg["slides_output_dir"]) / f"slides_{timestamp}"
+    output_root.mkdir(parents=True, exist_ok=True)
 
-    # 🔥 Limpiar directorio temporal
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-        logger.info("Directorio temporal eliminado: %s", out_dir)
+    results = []
+    for entry in data:
+        name = entry["name"]
+        last_url = entry["last_url"]
+        ok = download_all_slides(name, last_url, output_root)
+        results.append(ok)
+
+    # Global summary
+    ok_list = [n for n, ok in results if ok]
+    fail_list = [n for n, ok in results if not ok]
+
+    print("\n===== GLOBAL SUMMARY =====")
+    print(f"✔ OK: {len(ok_list)} | ✘ FAIL: {len(fail_list)}")
+    for n in ok_list:
+        print(f"✔ {n}")
+    for n in fail_list:
+        print(f"✘ {n}")
 
 
 if __name__ == "__main__":
