@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thinkfic-downloader"
+version = "0.1.0"
+description = "Herramientas para descargar videos y slides de Thinkific"
+authors = [{ name = "Tu Nombre", email = "tu@email.com" }]
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+    "yt-dlp>=2025.1.15",
+    "requests>=2.32.0",
+    "pillow>=10.0.0",
+    "colorama>=0.4.6",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+dev = ["black>=24.0.0", "flake8>=7.0.0", "pytest>=8.0.0"]
+
+[project.scripts]
+thinkfic-video = "thinkfic_downloader.video.cli:main"
+thinkfic-slides = "thinkfic_downloader.slides.cli:main"
+
+[tool.black]
+line-length = 150
+target-version = ["py39"]
+
+[tool.flake8]
+max-line-length = 150
+extend-ignore = ["E203", "W503"]
+exclude = [".venv", "venv", "env", "build", "dist", "__pycache__"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
