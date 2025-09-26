@@ -4,8 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "thinkfic-downloader"
-version = "0.1.0"
+version = "0.1.1"
 description = "Tools to download videos and slides from Thinkific"
+readme = "README.md"
+license = { file = "LICENSE" }
 authors = [{ name = "Cervantes Hernandez" }]
 requires-python = ">=3.9"
 dependencies = [
@@ -16,6 +18,12 @@ dependencies = [
     "colorama>=0.4.6",
     "tqdm>=4.66.0",
 ]
+keywords = ["thinkific", "downloader", "videos", "slides", "yt-dlp"]
+
+[project.urls]
+Homepage = "https://github.com/crh2302/thinkfic-downloader"
+Repository = "https://github.com/crh2302/thinkfic-downloader"
+Issues = "https://github.com/crh2302/thinkfic-downloader/issues"
 
 [project.optional-dependencies]
 dev = ["black>=24.0.0", "flake8>=7.0.0", "pytest>=8.0.0"]
