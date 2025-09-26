@@ -140,5 +140,3 @@ just slides
 
 MIT License. See the [LICENSE](LICENSE) file.
 
-```
-
