@@ -7,7 +7,7 @@ name = "thinkfic-downloader"
 version = "0.1.1"
 description = "Tools to download videos and slides from Thinkific"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
 authors = [{ name = "Cervantes Hernandez" }]
 requires-python = ">=3.9"
 dependencies = [
