@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "thinkfic-downloader"
 version = "0.1.0"
-description = "Herramientas para descargar videos y slides de Thinkific"
+description = "Tools to download videos and slides from Thinkific"
 authors = [{ name = "Cervantes Hernandez" }]
 requires-python = ">=3.9"
 dependencies = [
